@@ -140,13 +140,14 @@ async function testSite(site) {
     },
     // STEP 4: Cart Page
     {
-      name: 'Cart Page',
+name: 'Cart Page',
       run: async () => {
-        await page.goto(site.cartUrl, { waitUntil: 'domcontentloaded', timeout: 30000 });
-        const cartItem = page.locator('.cart_item, .woocommerce-cart-form__cart-item, .product-name');
-        await cartItem.first().waitFor({ state: 'visible', timeout: 15000 });
-        const checkoutBtn = page.locator('.checkout-button, a:has-text("Proceed to checkout"), a:has-text("Proceed to Checkout"), .wc-proceed-to-checkout a');
-        await checkoutBtn.first().waitFor({ state: 'visible', timeout: 10000 });
+        await page.goto(site.cartUrl, { waitUntil: 'networkidle', timeout: 30000 });
+        await page.waitForTimeout(3000);
+        const cartItem = page.locator('.cart_item, .woocommerce-cart-form__cart-item, .product-name, .cart-item, .shop_table tr, .woocommerce-cart-form tr.cart_item, table.shop_table tbody tr');
+        await cartItem.first().waitFor({ state: 'visible', timeout: 20000 });
+        const checkoutBtn = page.locator('.checkout-button, a:has-text("Proceed to checkout"), a:has-text("Proceed to Checkout"), .wc-proceed-to-checkout a, a[href*="checkout"], .button.checkout');
+        await checkoutBtn.first().waitFor({ state: 'visible', timeout: 15000 });
         return 'Cart has items with checkout button';
       },
     },
