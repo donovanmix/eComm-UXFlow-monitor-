@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  checkout-monitor:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - ALERT_EMAILS=${ALERT_EMAILS}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+    volumes:
+      - monitor-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  monitor-data:
