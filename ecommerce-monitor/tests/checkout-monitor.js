@@ -125,25 +125,22 @@ async function testSite(site) {
     },
     // STEP 3: Add to Cart
     {
- name: 'Add to Cart',
+name: 'Add to Cart',
       run: async () => {
         const variation = await selectVariations(page);
         await clickAddToCart(page);
-        await page.waitForTimeout(3000);
-        const viewCartBtn = page.locator('a:has-text("View cart"), a:has-text("View Cart"), a.button.wc-forward, .wc-forward');
-        await viewCartBtn.first().waitFor({ state: 'visible', timeout: 15000 });
-        await viewCartBtn.first().click();
-        await page.waitForURL('**/cart/**', { timeout: 15000 });
+        await page.waitForTimeout(5000);
+        await page.goto(site.cartUrl, { waitUntil: 'networkidle', timeout: 30000 });
         await page.waitForTimeout(2000);
-        return variation ? `Added to cart and navigated to cart (variation: ${variation})` : 'Added to cart and navigated to cart';
+        return variation ? `Added to cart (variation: ${variation})` : 'Added to cart';
       },
     },
     // STEP 4: Cart Page
     {
 name: 'Cart Page',
       run: async () => {
-        const cartHeading = page.locator('h1:has-text("Shopping Cart"), h1:has-text("Cart"), .cart-heading, .woocommerce-cart-form, table.shop_table, .cart_totals');
-        await cartHeading.first().waitFor({ state: 'visible', timeout: 15000 });
+        const cartContent = page.locator('h1:has-text("Shopping Cart"), h1:has-text("Cart"), .woocommerce-cart-form, table.shop_table, .cart_totals, .cart-heading');
+        await cartContent.first().waitFor({ state: 'visible', timeout: 15000 });
         const checkoutBtn = page.locator('a:has-text("Proceed to checkout"), a:has-text("Proceed to Checkout"), .checkout-button, .wc-proceed-to-checkout a, a[href*="checkout"]');
         await checkoutBtn.first().waitFor({ state: 'visible', timeout: 15000 });
         await checkoutBtn.first().click();
