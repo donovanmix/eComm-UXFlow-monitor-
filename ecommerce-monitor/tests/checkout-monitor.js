@@ -125,30 +125,31 @@ async function testSite(site) {
     },
     // STEP 3: Add to Cart
     {
-      name: 'Add to Cart',
+ name: 'Add to Cart',
       run: async () => {
         const variation = await selectVariations(page);
         await clickAddToCart(page);
-        const cartSuccess = page.locator('.woocommerce-message, .added_to_cart, .cart-count, .wc-forward');
-        await Promise.race([
-          cartSuccess.first().waitFor({ timeout: 15000 }).catch(() => null),
-          page.waitForURL('**/cart/**', { timeout: 15000 }).catch(() => null),
-          page.waitForTimeout(10000),
-        ]);
-        return variation ? `Added to cart (variation: ${variation})` : 'Added to cart';
+        await page.waitForTimeout(3000);
+        const viewCartBtn = page.locator('a:has-text("View cart"), a:has-text("View Cart"), a.button.wc-forward, .wc-forward');
+        await viewCartBtn.first().waitFor({ state: 'visible', timeout: 15000 });
+        await viewCartBtn.first().click();
+        await page.waitForURL('**/cart/**', { timeout: 15000 });
+        await page.waitForTimeout(2000);
+        return variation ? `Added to cart and navigated to cart (variation: ${variation})` : 'Added to cart and navigated to cart';
       },
     },
     // STEP 4: Cart Page
     {
 name: 'Cart Page',
       run: async () => {
-        await page.goto(site.cartUrl, { waitUntil: 'networkidle', timeout: 30000 });
-        await page.waitForTimeout(3000);
-        const cartItem = page.locator('.cart_item, .woocommerce-cart-form__cart-item, .product-name, .cart-item, .shop_table tr, .woocommerce-cart-form tr.cart_item, table.shop_table tbody tr');
-        await cartItem.first().waitFor({ state: 'visible', timeout: 20000 });
-        const checkoutBtn = page.locator('.checkout-button, a:has-text("Proceed to checkout"), a:has-text("Proceed to Checkout"), .wc-proceed-to-checkout a, a[href*="checkout"], .button.checkout');
+        const cartHeading = page.locator('h1:has-text("Shopping Cart"), h1:has-text("Cart"), .cart-heading, .woocommerce-cart-form, table.shop_table, .cart_totals');
+        await cartHeading.first().waitFor({ state: 'visible', timeout: 15000 });
+        const checkoutBtn = page.locator('a:has-text("Proceed to checkout"), a:has-text("Proceed to Checkout"), .checkout-button, .wc-proceed-to-checkout a, a[href*="checkout"]');
         await checkoutBtn.first().waitFor({ state: 'visible', timeout: 15000 });
-        return 'Cart has items with checkout button';
+        await checkoutBtn.first().click();
+        await page.waitForURL('**/checkout/**', { timeout: 15000 });
+        await page.waitForTimeout(2000);
+        return 'Cart verified and navigated to checkout';
       },
     },
     // STEP 5: Checkout Page (STOP before iPay88)
