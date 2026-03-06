@@ -60,11 +60,10 @@ app.post('/api/run-test', async (req, res) => {
   res.json({ message: 'Test started. Refresh dashboard in 2-3 minutes.' });
 
   try {
-    const results = await runAllTests();
-    // Send notifications if any failures
-    if (results.summary.failed > 0) {
-      await sendEmailAlert(results);
-      await sendTelegramAlert(results);
+const results = await runAllTests();
+    // Send notifications every time (pass or fail)
+    await sendEmailAlert(results);
+    await sendTelegramAlert(results);
     }
   } catch (err) {
     console.error('Test run error:', err);
